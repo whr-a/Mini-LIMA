@@ -1,0 +1,11 @@
+{
+    "seed_transfromed.jsonl": {
+      "file_name": "seed_transfromed.jsonl",
+      "formatting": "alpaca",
+      "columns": {
+        "prompt": "instruction",
+        "query": "input",
+        "response": "output"
+      }
+    }
+}
