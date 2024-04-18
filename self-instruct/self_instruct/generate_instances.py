@@ -6,7 +6,7 @@ import re
 import argparse
 import pandas as pd
 from collections import OrderedDict
-from gpt3_api import make_requests_raw as make_gpt3_requests
+from gpt3_api import make_requests_http as make_gpt3_requests
 from templates.instance_gen_template import output_first_template_for_clf, input_first_template_for_gen
 
 

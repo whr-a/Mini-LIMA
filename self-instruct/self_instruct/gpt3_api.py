@@ -19,7 +19,7 @@ except ImportError:
 # api_base = "https://api.openai.com/v1"
 api_base = "https://lonlie.plus7.plus/v1"
     
-def make_requests_raw(
+def make_requests_http(
         prompts, *args,
         model="gpt-3.5-turbo", max_tokens=1024, temperature=0.7, top_p=0.5, 
         frequency_penalty=0, presence_penalty=0, stop_sequences=["\n\n"], logprobs=5, n=1, best_of=1, retries=3, 

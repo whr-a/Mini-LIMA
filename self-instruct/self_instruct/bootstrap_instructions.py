@@ -10,7 +10,7 @@ import pandas as pd
 from multiprocessing import Pool
 from functools import partial
 from rouge_score import rouge_scorer
-from gpt3_api import make_requests_raw as make_gpt3_requests
+from gpt3_api import make_requests_http as make_gpt3_requests
 from utils import dump_dataclass
 
 random.seed(42)
