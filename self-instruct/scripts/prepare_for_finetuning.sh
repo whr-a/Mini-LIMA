@@ -1,4 +1,4 @@
-batch_dir=data/gpt3_generations/
+batch_dir=${1:-"data/gpt3_generations/"}
 
 python self_instruct/prepare_for_finetuning.py \
     --instance_files ${batch_dir}/machine_generated_instances.jsonl \

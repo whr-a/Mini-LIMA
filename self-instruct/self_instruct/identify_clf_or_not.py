@@ -6,7 +6,7 @@ import re
 import argparse
 import pandas as pd
 from collections import OrderedDict
-from gpt3_api import make_requests as make_gpt3_requests
+from gpt3_api import make_requests_raw as make_gpt3_requests
 from templates.clf_task_template import template_1
 
 
@@ -93,7 +93,7 @@ if __name__ == '__main__':
                         (k, data[k]) for k in \
                             ["instruction", "is_classification"]
                         )
-                    fout.write(json.dumps(data, ensure_ascii=False) + "\n")
+                    fout.write(json.dumps(data, ensure_ascii=False, default=lambda obj: obj.__dict__) + "\n")
             else:
                 # prefix = compose_prompt_prefix(human_written_tasks, batch[0]["instruction"], 8, 2)
                 prefix = templates[args.template]
@@ -115,7 +115,7 @@ if __name__ == '__main__':
                 for i in range(len(batch)):
                     data = batch[i]
                     if results[i]["response"] is not None:
-                        data["is_classification"] = results[i]["response"]["choices"][0]["text"]
+                        data["is_classification"] = results[i]["response"]["choices"][0]["message"]["content"]
                     else:
                         data["is_classification"] = ""
                     data = {
@@ -126,5 +126,5 @@ if __name__ == '__main__':
                         (k, data[k]) for k in \
                             ["instruction", "is_classification"]
                         )
-                    fout.write(json.dumps(data, ensure_ascii=False) + "\n")
+                    fout.write(json.dumps(data, ensure_ascii=False, default=lambda obj: obj.__dict__) + "\n")
             progress_bar.update(len(batch))

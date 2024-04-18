@@ -6,16 +6,105 @@ import openai
 from datetime import datetime
 import argparse
 import time
-from openai import OpenAI
-    
 
-def make_requests(
-        engine, prompts, max_tokens, temperature, top_p, 
-        frequency_penalty, presence_penalty, stop_sequences, logprobs, n, best_of, retries=3, api_key=None, organization=None
+import requests
+from utils import deprecated, dump_dataclass, AttrDict
+
+try:
+    from openai import OpenAI
+except ImportError:
+    print("[WARNING] `openai` package has not been installed or with incorrect version.")
+    pass
+
+# api_base = "https://api.openai.com/v1"
+api_base = "https://lonlie.plus7.plus/v1"
+    
+def make_requests_raw(
+        prompts, *args,
+        model="gpt-3.5-turbo", max_tokens=1024, temperature=0.7, top_p=0.5, 
+        frequency_penalty=0, presence_penalty=0, stop_sequences=["\n\n"], logprobs=5, n=1, best_of=1, retries=3, 
+        api_key=None, organization=None, **kwargs
     ):
-    response = None
-    target_length = max_tokens
-    client = OpenAI(api_key="",base_url="https://lonlie.plus7.plus/v1")
+    """
+    Communicate with OpenAI GPT3.5 API via HTTP requests.
+    """
+
+    if not api_key:
+        api_key = os.getenv("OPENAI_API_KEY")
+    assert api_key, "Please provide an API key for OpenAI GPT3."
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_key}",
+    }
+    payload = {
+        "model": model,
+        "messages": [{"role": "user", "content": x} for x in prompts],
+        "temperature": temperature,
+        "top_p": top_p,
+        "max_tokens": max_tokens,
+        "frequency_penalty": frequency_penalty,
+        "presence_penalty": presence_penalty,
+        "stop": stop_sequences,
+        "n": n,
+        # "logprobs": logprobs,
+        # "best_of": best_of,
+    }
+    
+    retry = 0
+    while retry < retries:
+        try:
+            response = requests.post(
+                f"{api_base}/chat/completions",
+                headers=headers,
+                json=payload,
+            )
+            response.raise_for_status()
+        except Exception as e:
+            print(f"Failed to get response from OpenAI: {e}. Retry {retry}/{retries}.")
+            retry += 1
+            time.sleep(5)
+        else:
+            break
+
+    assert retry < retries, "Failed to get response from OpenAI."
+    response = response.json()
+
+    if isinstance(prompts, list):
+        results = []
+        for i, prompt in enumerate(prompts):
+            # print(len(response.choices), (i*n,(i+1)*n), response.choices[i * n: (i + 1) * n])
+            data = {
+                "prompt": prompt,
+                "response": {"choices": response["choices"][i * n: (i + 1) * n]} if response else None,
+                "created_at": str(datetime.now()),
+            }
+            results.append(data)
+        return results
+    else:
+        data = {
+            "prompt": prompts,
+            "response": response,
+            "created_at": str(datetime.now()),
+        }
+        return [data]
+
+@deprecated
+def make_requests(
+        prompts, model="gpt-3.5-turbo", max_tokens=1024, temperature=0.7, top_p=0.5, 
+        frequency_penalty=0, presence_penalty=0, stop_sequences=["\n\n"], logprobs=5, n=1, best_of=1, retries=3, 
+        api_key=None, organization=None,
+    ):
+    
+    if not api_key:
+        api_key = os.getenv("OPENAI_API_KEY")
+    assert api_key, "Please provide an API key for OpenAI GPT3."
+
+    client = OpenAI(
+        api_key=api_key,
+        base_url="https://lonlie.plus7.plus/v1"
+    )
+    
     retry_cnt = 0
     backoff_time = 30
     while retry_cnt <= retries:
@@ -54,7 +143,6 @@ def make_requests(
             "created_at": str(datetime.now()),
         }
         return [data]
-
 
 def parse_args():
     parser = argparse.ArgumentParser()

@@ -10,8 +10,8 @@ import pandas as pd
 from multiprocessing import Pool
 from functools import partial
 from rouge_score import rouge_scorer
-from gpt3_api import make_requests as make_gpt3_requests
-
+from gpt3_api import make_requests_raw as make_gpt3_requests
+from utils import dump_dataclass
 
 random.seed(42)
 
@@ -39,9 +39,9 @@ def find_word_in_string(w, s):
 
 
 def post_process_gpt3_response(response):
-    if response is None or len(response['choices']) == 0 or response["choices"][0].finish_reason == "length":
+    if response is None or len(response['choices']) == 0 or response["choices"][0]["finish_reason"] == "length":
         return []
-    raw_instructions = re.split(r"\n\d+\s?\. ", response["choices"][0].message.content)
+    raw_instructions = re.split(r"\n\d+\s?\. ", response["choices"][0]["message"]["content"])
     instructions = []
     for inst in raw_instructions:
         inst = re.sub(r"\s+", " ", inst).strip()
@@ -127,19 +127,6 @@ def parse_args():
     )
     return parser.parse_args()
 
-def dump_dataclass(object):
-    if isinstance(object, int) \
-    or isinstance(object, str) \
-    or isinstance(object, float) \
-    or isinstance(object, bool) \
-    or object is None:
-        return object
-    if isinstance(object, list):
-        return list(map(dump_dataclass, object))
-    if isinstance(object, dict):
-        return dict(map(lambda e: (e[0], dump_dataclass(e[1])), object.items()))
-    return dict(map(lambda e: (e[0], dump_dataclass(e[1])), object.__dict__.items()))
-
 if __name__ == "__main__":
     args = parse_args()
     seed_tasks = [json.loads(l) for l in open(args.seed_tasks_path, "r")]
@@ -220,7 +207,7 @@ if __name__ == "__main__":
                     "instruction": inst,
                     "most_similar": most_similar_instructions,
                     "avg_similarity_score": float(np.mean(rouge_scores)),
-                    "metadata": dump_dataclass(metadata),
+                    "metadata": metadata,
                     "request_idx": request_idx
                 }) + "\n")
                 progress_bar.update(1)

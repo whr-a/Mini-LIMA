@@ -6,7 +6,7 @@ import re
 import argparse
 import pandas as pd
 from collections import OrderedDict
-from gpt3_api import make_requests as make_gpt3_requests
+from gpt3_api import make_requests_raw as make_gpt3_requests
 from templates.instance_gen_template import output_first_template_for_clf, input_first_template_for_gen
 
 
@@ -128,7 +128,7 @@ if __name__ == '__main__':
                             ["instruction", "raw_instances", "instance_metadata", "instruction_metadata", 
                             "most_similar", "avg_similarity_score"]
                         )
-                    fout.write(json.dumps(data, ensure_ascii=False) + "\n")
+                    fout.write(json.dumps(data, ensure_ascii=False, default=lambda obj: obj.__dict__) + "\n")
             else:
                 prompts = []
                 for task in batch:
@@ -157,7 +157,7 @@ if __name__ == '__main__':
                     data = batch[i]
                     data["instance_metadata"] = results[i]
                     if results[i]["response"] is not None:
-                        data["raw_instances"] = results[i]["response"]["choices"][0]["text"]
+                        data["raw_instances"] = results[i]["response"]["choices"][0]["message"]["content"]
                     else:
                         data["raw_instances"] = ""
                     data = OrderedDict(
@@ -165,5 +165,5 @@ if __name__ == '__main__':
                             ["instruction", "raw_instances", "instance_metadata", "instruction_metadata", 
                             "most_similar", "avg_similarity_score"]
                         )
-                    fout.write(json.dumps(data, ensure_ascii=False) + "\n")
+                    fout.write(json.dumps(data, ensure_ascii=False, default=lambda obj: obj.__dict__) + "\n")
             progress_bar.update(len(batch))

@@ -1,4 +1,4 @@
-batch_dir=data/gpt3_generations/
+batch_dir=${1:-"data/gpt3_generations/"}
 
 python self_instruct/generate_instances.py \
     --batch_dir ${batch_dir} \
@@ -6,4 +6,4 @@ python self_instruct/generate_instances.py \
     --output_file machine_generated_instances.jsonl \
     --max_instances_to_gen 5 \
     --engine "davinci" \
-    --request_batch_size 5
+    --request_batch_size 1
