@@ -1,3 +1,5 @@
 alpaca_eval/
 hw2/modelscope_hub/
 LLaMA-Factory/
+test.sh
+qwen_runner

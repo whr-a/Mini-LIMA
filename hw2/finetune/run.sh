@@ -1,6 +1,6 @@
 export MODEL_NAME="qwen_sft"
-export DATA_DIR="dataset"
-export DATA_NAME="seed_transfromed.jsonl"
+export DATA_DIR="/home/whr-a/llm/LLaMA-Factory/data"
+export DATA_NAME="qwen_data"
 export BASE_MODEL="/home/whr-a/llm/hw2/modelscope_hub/qwen/Qwen1___5-0___5B"
 
 cd /home/whr-a/llm/LLaMA-Factory
