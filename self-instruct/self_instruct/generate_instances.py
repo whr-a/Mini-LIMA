@@ -96,7 +96,7 @@ if __name__ == '__main__':
     with open(os.path.join(args.batch_dir, "is_clf_or_not_davinci_template_1.jsonl")) as fin:
         for line in fin:
             data = json.loads(line)
-            task_clf_types[data["instruction"]] = data["is_classification"].strip() in ["Yes", "yes", "YES"]
+            task_clf_types[data["instruction"]] = data["is_classification"].strip()[:3] in ["Yes", "yes", "YES"]
 
     if args.classification_tasks_only:
         tasks = [task for task in tasks if task_clf_types[task["instruction"]]]

@@ -136,6 +136,15 @@ def filter_invalid_instances(instances):
         # if input or output ends with a colon, these are usually imcomplete generation. We will not use such instances
         if instance[1].strip().endswith(":") or instance[2].strip().endswith(":"):
             continue
+        # specially for classification,we need to have input
+        if instance[1] == "":
+            continue
+        if instance[1].strip().startswith(("- ","1.","2.","3.","4.","5.","6.","7.","8.","9.")):
+            return []
+        if instance[1].strip().startswith(("Dialogue","Code","Sentence","Credit","Thread","Input:\n- Task:","Equation:","Input:")):
+            return []
+        if instance[0].strip().startswith(("1.","2.","3.","4.","5.","6.","7.","8.","9.","10")):
+            return []
         filtered_instances.append(instance)
     return filtered_instances
 
@@ -195,7 +204,13 @@ if __name__ == "__main__":
     args = parse_args()
 
     training_instances = []
-    
+    # if args.include_seed_tasks:
+    #     seed_tasks = [json.loads(l) for l in open(args.seed_tasks_path, "r")]
+    #     for task in seed_tasks:
+    #         for instance in task["instances"]:
+    #             training_instances.append((task["instruction"], instance["input"], instance["output"]))
+    #     print(f"Included {len(seed_tasks)} seed tasks")
+
     generated_tasks = []
     for instance_file in args.instance_files:
         with open(instance_file) as fin:
@@ -208,7 +223,7 @@ if __name__ == "__main__":
         with open(file) as fin:
             for line in fin:
                 data = json.loads(line)
-                task_clf_types[data["instruction"]] = data["is_classification"].strip() in ["Yes", "yes", "YES"]
+                task_clf_types[data["instruction"]] = data["is_classification"].strip()[:3] in ["Yes", "yes", "YES"]
 
     for task in tqdm.tqdm(generated_tasks):
         # get instruction
@@ -238,13 +253,13 @@ if __name__ == "__main__":
                 "input": instance[1],
                 "output": instance[2],
             }) + "\n")
-    print(f"Saved {len(training_instances)} instances")
+    # print(f"Saved {len(training_instances)} instances")
     unique_instructions = set([it[0] for it in training_instances])
-    print(f"Unique instructions: {len(unique_instructions)}")
-    clf_instructions = [instruction for instruction in unique_instructions if task_clf_types[instruction]]
-    print(f"Classification instructions: {len(clf_instructions)}")
-    non_clf_instructions = [instruction for instruction in unique_instructions if not task_clf_types[instruction]]
-    print(f"Non-classification instructions: {len(non_clf_instructions)}")
+    # print(f"Unique instructions: {len(unique_instructions)}")
+    # clf_instructions = [instruction for instruction in unique_instructions if task_clf_types[instruction]]
+    # print(f"Classification instructions: {len(clf_instructions)}")
+    # non_clf_instructions = [instruction for instruction in unique_instructions if not task_clf_types[instruction]]
+    # print(f"Non-classification instructions: {len(non_clf_instructions)}")
 
     if args.num_instructions is not None:
         print(f"Sampling {args.num_instructions} instructions")
