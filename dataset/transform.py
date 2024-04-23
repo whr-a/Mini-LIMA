@@ -1,38 +1,30 @@
 import json
 
-def transform_jsonl(input_file_path, output_file_path):
-    # 打开原始的 JSONL 文件进行读取
-    with open(input_file_path, 'r', encoding='utf-8') as file:
-        lines = file.readlines()
-    
-    # 准备新的数据集
-    transformed_data = []
-    
-    # 遍历每一行数据
-    for line in lines:
-        # 解析 JSON 数据
-        data = json.loads(line)
+def convert_jsonl_to_custom_format(input_file, output_file):
+    # 打开输入文件和输出文件
+    with open(input_file, 'r', encoding='utf-8') as infile, \
+         open(output_file, 'w', encoding='utf-8') as outfile:
         
-        # 提取需要的字段
-        instruction = data['instruction']
-        input_text = data['instances'][0]['input']  # 假设每个任务只有一个实例
-        output = data['instances'][0]['output']
+        # 创建一个空列表用于存储转换后的数据
+        converted_data = []
         
-        # 构建新的 JSON 对象
-        transformed_entry = {
-            'instruction': instruction,
-            'input': input_text,
-            'output': output
-        }
-        transformed_data.append(transformed_entry)
-    
-    # 打开输出文件，写入转换后的数据
-    with open(output_file_path, 'w', encoding='utf-8') as output_file:
-        for item in transformed_data:
-            json_line = json.dumps(item) + '\n'
-            output_file.write(json_line)
+        # 逐行读取JSONL数据
+        for line in infile:
+            # 将每行数据从JSON格式转换为Python字典
+            data = json.loads(line)
+            
+            # 创建新的格式字典
+            new_format = {
+                "instruction": data["instruction"],
+                "input": data["input"],  # 使用get来处理可选字段
+                "output": data["output"],
+            }
+            
+            # 将新格式的字典添加到列表中
+            converted_data.append(new_format)
+        
+        # 将整个列表转换为JSON格式，并写入输出文件
+        json.dump(converted_data, outfile, ensure_ascii=False, indent=2)
 
-# 调用函数进行文件转换
-input_file_path = 'seed_tasks_test.jsonl'
-output_file_path = 'seed_transfromed.jsonl'
-transform_jsonl(input_file_path, output_file_path)
+# 调用函数进行转换
+convert_jsonl_to_custom_format('all_generated_instances.jsonl', 'data.json')

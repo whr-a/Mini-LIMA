@@ -1,6 +1,6 @@
 {
-    "seed_transfromed.jsonl": {
-      "file_name": "seed_transfromed.jsonl",
+    "qwen_data": {
+      "file_name": "qwen_data.jsonl",
       "formatting": "alpaca",
       "columns": {
         "prompt": "instruction",
