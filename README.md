@@ -52,3 +52,4 @@ alpaca_eval evaluate_from_model \
 ```
 
 See the result in results/evaluate.
+Specially,the model output predictions is in [`results/evaluate/model_outputs.json`](results/evaluate/model_outputs.json)
