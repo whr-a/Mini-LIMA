@@ -25,7 +25,8 @@ Here are the scripts for generating the data:
 # 4. Filtering, processing, and reformatting
 ./scripts/prepare_for_finetuning.sh
 ```
-The generated data is placed in the dataset directory.
+
+The final generated data is placed in the dataset directory.
 
 ## model alignment via supervised fine-tuning(sft)
 
