@@ -27,6 +27,7 @@ Here are the scripts for generating the data:
 ```
 
 The final generated data is placed in the dataset directory.
+The detailed data generation can be seen in the [`self-instruct/data/README.md`](self-instruct/data/README.md)
 
 ## model alignment via supervised fine-tuning(sft)
 
