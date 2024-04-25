@@ -8,8 +8,23 @@ In this assignment, we complete:
 
 ## instruction dataset construction
 
-Corresponding self_structure in the depository.
+To generate Self-Instruct data using our own seed tasks, we can run the follow scripts for the entire pipeline. Our code can be tested on the GPT-3.5-turbo model accessible via the [OpenAI API]
 
+Here are the scripts for generating the data:
+```bash
+# 1. Generate instructions from the seed tasks
+# If you want to generate instructions of classification only,add "--use_clf_seed_tasks_only" in the script
+./scripts/generate_instructions.sh
+
+# 2. Identify whether the instruction represents a classification task or not
+./scripts/is_clf_or_not.sh
+
+# 3. Generate instances for each instruction
+./scripts/generate_instances.sh
+
+# 4. Filtering, processing, and reformatting
+./scripts/prepare_for_finetuning.sh
+```
 The generated data is placed in the dataset directory.
 
 ## model alignment via supervised fine-tuning(sft)

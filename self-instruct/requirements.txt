@@ -4,7 +4,7 @@
 rouge-score 
 tqdm  
 numpy  
-openai==0.24.0  
+openai 
 benepar  
 spacy  
 plotly 
